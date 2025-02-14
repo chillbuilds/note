@@ -4,13 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet", href="./styles/style.css">
+    <link rel="stylesheet", href="./styles/bootstrap.css">
+    <link rel="stylesheet", href="./styles/quill.css">
     <title>notes</title>
 </head>
-<body>
+<body style="background-color: #1E1B18;">
     
-    
+    <div class="container">
+        <div id="appContainer">
+            <div class="row p-3">
+
+                <div class="col-3 sideColumn">
+                    <div id="folderColumn" class="column">folders:
+                        <div id="folders">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 editColumn">
+                    <div id="noteContainer" class="column">
+                        <div id="breadCrumbs"></div>
+                        <div id="noteData"></div>
+                    </div>
+                    <div id="editor" class="column"></div>
+                    <div id="update" style="cursor:pointer; width:fit-content; border:black solid 2px; padding:6px; margin-top:12px;">update note</div>
+                    <div id="edit" style="cursor:pointer; width:fit-content; border:black solid 2px; padding:6px; margin-top:12px;">edit note</div>
+                </div>
+                <div class="col-3 sideColumn">
+                    <div id="notesColumn" class="column">notes:
+                        <div id="notes">
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </div>
 
     <script src="./scripts/jquery.js"></script>
+    <script src="./scripts/quill.js"></script>
     <script src="./scripts/index.js"></script>
 </body>
 </html>

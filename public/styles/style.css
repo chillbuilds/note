@@ -1,0 +1,50 @@
+/* 
+palette:
+#EFEFEF anti-flash white
+#1E1B18 eerie black
+#3E6990  lapis lazuli
+#B27092 sky magenta
+*/
+
+body {
+    overflow-y: hidden;
+}
+
+.container {
+    position: relative;
+    height: 100vh;
+    background: #EFEFEF;
+}
+
+.column {
+    border: #1E1B18 solid 2px;
+    padding: 8px;
+}
+
+.sideColumn {
+    user-select: none;
+}
+
+.folder {
+    cursor: pointer;
+}
+
+.note {
+    cursor: pointer;
+}
+
+#noteDisplay {
+
+}
+
+#breadCrumbs {
+    margin-bottom: 200px;
+}
+
+#editor {
+    display: none;
+}
+
+.ql-toolbar {
+    display: none;
+}
