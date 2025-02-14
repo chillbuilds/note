@@ -39,8 +39,9 @@ $(document).ready(function() {
             })
         })
       
-    }).fail(function() {
+    }).fail(function(err) {
       alert('error fetching data')
+      console.log(err)
     })
 
     $('#update').on('click', function() {
