@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-app.get('/folder_names', (req, res) => {
+app.get('/api/folder_names', (req, res) => {
     const testID = process.env.DB_TESTID
     const query = 'SELECT DISTINCT folder_name FROM notes WHERE user_id = ? ORDER BY modified_at DESC'
 
@@ -39,7 +39,7 @@ app.get('/folder_names', (req, res) => {
     })
 })
 
-app.get('/note_names', (req, res) => {
+app.get('/api/note_names', (req, res) => {
     const folderName = req.query.folder_name
     const testID = process.env.DB_TESTID
     const query = 'SELECT title FROM notes WHERE user_id = ? AND folder_name = ? AND note_type != ? ORDER BY modified_at DESC'
@@ -53,7 +53,7 @@ app.get('/note_names', (req, res) => {
     })
 })
 
-app.get('/note', (req, res) => {
+app.get('/api/note', (req, res) => {
     const noteName = req.query.title
     const testID = process.env.DB_TESTID
 
@@ -70,7 +70,7 @@ app.get('/note', (req, res) => {
 })
 
 
-app.post('/add_folder', (req, res) => {
+app.post('api/add_folder', (req, res) => {
     const { user_id, title, content, folder_name } = req.body
     const query = 'INSERT INTO notes (user_id, title, content, note_type, folder_name) VALUES (?, ?, ?, ?, ?)'
     
@@ -83,7 +83,7 @@ app.post('/add_folder', (req, res) => {
     })
 })
 
-app.post('/add_note', (req, res) => {
+app.post('api/add_note', (req, res) => {
     const { user_id, title, content, folder_name } = req.body
     const query = 'INSERT INTO notes (user_id, title, content, note_type, folder_name) VALUES (?, ?, ?, ?, ?)'
     

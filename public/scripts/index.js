@@ -10,7 +10,7 @@ $(document).ready(function() {
         theme: 'snow'
     })
     
-    $.get('/folder_names', function(folderNames) {
+    $.get('/api/folder_names', function(folderNames) {
 
         folderNames.forEach(folder => {
             $('#folders').append(`<div class="folder">${folder.folder_name}</div>`)
@@ -18,7 +18,7 @@ $(document).ready(function() {
 
         $('.folder').on('click', function() {
             let folderName = $(this).text()
-            $.get('/note_names', {folder_name: folderName}, function(noteNames) {
+            $.get('/api/note_names', {folder_name: folderName}, function(noteNames) {
 
                 $('#notes').html('')
                 noteNames.forEach(note => {
@@ -28,7 +28,7 @@ $(document).ready(function() {
 
                 $('.note').on('click', function() {
                     const noteName = $(this).text()
-                    $.get('/note', {title: noteName}, function(noteData) {
+                    $.get('/api/note', {title: noteName}, function(noteData) {
                         noteData = noteData[0]
                         $('#noteData').text(noteData.content)
                         $('#breadCrumbs').text(noteData.folder_name + ' / ' + noteData.title)
