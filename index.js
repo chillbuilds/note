@@ -25,12 +25,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-app.get('/test', (req, res) => {
-    const testID = process.env.DB_TESTID
-    res.json([{test_id: testID}])
-    // res.sendFile(path.join(__dirname, 'public', 'test.html'))
-})
-
 app.get('/folder_names', (req, res) => {
     const testID = process.env.DB_TESTID
     const query = 'SELECT DISTINCT folder_name FROM notes WHERE user_id = ? ORDER BY modified_at DESC'
@@ -62,16 +56,25 @@ app.get('/note', (req, res) => {
     const noteName = req.query.title
     const testID = process.env.DB_TESTID
 
-    console.log(noteName)
-    const query = 'SELECT folder_name, title, content, modified_at, created_at FROM notes WHERE user_id = ? AND  title = ? AND note_type != ? ORDER BY modified_at DESC'
+    const noteQuery = 'SELECT folder_name, title, content, modified_at, created_at FROM notes WHERE user_id = ? AND  title = ? AND note_type != ? ORDER BY modified_at DESC'
 
-    pool.query(query, [testID, noteName, 'placeholder'], (err, results) => {
+    pool.query(noteQuery, [testID, noteName, 'placeholder'], (err, results) => {
         if (err) {
-            console.error('Error executing query: ' + err.stack)
-            return res.status(500).send('Error fetching notes')
+            console.error('error executing query: ' + err.stack)
+            return res.status(500).send('error fetching notes')
         }
         res.json(results)
     })
+
+    const updateQuery = 'UPDATE users SET last_note_title = ? WHERE id = ?'
+
+    pool.query(updateQuery, [noteName, testID], (err, results) => {
+        if (err) {
+            console.error('error executing last_note_title update query: ' + err.stack)
+            return res.status(500).send('error updating last_note_title')
+        }
+    })
+
 })
 
 
@@ -84,7 +87,7 @@ app.post('/add_folder', (req, res) => {
             console.error('Error inserting folder: ' + err.stack)
             return res.status(500).send('Error inserting folder')
         }
-        res.status(200).send('Folder added successfully')
+        res.status(200).send('folder added successfully')
     })
 })
 

@@ -1,13 +1,15 @@
 /* 
 palette:
 #EFEFEF anti-flash white
-#1E1B18 eerie black
+#1D3461 eerie black
 #3E6990  lapis lazuli
 #B27092 sky magenta
 */
 
 body {
+    color: #1D3461;
     overflow-y: hidden;
+    font-family: 'Lucida Sans Typewriter', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .container {
@@ -17,34 +19,66 @@ body {
 }
 
 .column {
-    border: #1E1B18 solid 2px;
+    border: #1D3461 solid 2px;
     padding: 8px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .sideColumn {
     user-select: none;
+    font-size: 20px;
 }
 
 .folder {
     cursor: pointer;
+    margin: 2px;
+    margin-bottom: 8px;
+    padding: 4px;
+    border: solid #1D3461 2px;
+    text-align: center;
+}
+
+.folder:hover {
+    background: #1D3461;
+    color: #EFEFEF;
 }
 
 .note {
     cursor: pointer;
 }
 
-#noteDisplay {
+#noteTitle {
+    padding: 4px;
+    background: none;
+    border: none;
+}
+
+#noteContainer {
 
 }
 
 #breadCrumbs {
-    margin-bottom: 200px;
+    width: fit-content;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #1D3461;
 }
 
 #editor {
-    display: none;
+    
 }
 
 .ql-toolbar {
     display: none;
+}
+
+.testBtn {
+    position: absolute;
+    bottom: 16px;
+    cursor:pointer; 
+    width:fit-content; 
+    border:black solid 2px; 
+    padding:6px; 
+    margin-top:12px;
 }
