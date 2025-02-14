@@ -21,12 +21,13 @@ const pool = mysql.createPool({
     keepAliveInitialDelay: 10000 // Initial delay of 10 seconds before sending keep-alive packets
 })
 
-// Use the pool to execute queries
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
 app.get('/test', (req, res) => {
+    const testID = process.env.DB_TESTID
+    console.log('test id:', testID)
     res.sendFile(path.join(__dirname, 'public', 'test.html'))
 })
 
@@ -37,7 +38,7 @@ app.get('/folder_names', (req, res) => {
     pool.query(query, [testID], (err, results) => {
         if (err) {
             console.error('Error executing query: ' + err.stack)
-            return res.status(500).send('Error fetching notes')
+            return res.status(500).send('error fetching folder names')
         }
         res.json(results)
     })
