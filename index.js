@@ -27,8 +27,8 @@ app.get('/', (req, res) => {
 
 app.get('/test', (req, res) => {
     const testID = process.env.DB_TESTID
-    console.log('test id:', testID)
-    res.sendFile(path.join(__dirname, 'public', 'test.html'))
+    res.json([{test_id: testID}])
+    // res.sendFile(path.join(__dirname, 'public', 'test.html'))
 })
 
 app.get('/folder_names', (req, res) => {
