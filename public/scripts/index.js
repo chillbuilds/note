@@ -1,4 +1,6 @@
-let selectedFolder = ""
+let currentFolder = ''
+let currentNote = ''
+let currentNoteID = ''
 
 $(document).ready(function() {
 
@@ -10,6 +12,25 @@ $(document).ready(function() {
         theme: 'snow'
     })
     quill.root.setAttribute('spellcheck', false)
+
+    let updateUI = () => {
+        $.get('/folder_names', function(folderNames) {
+            $('#folders').html('')
+            folderNames.forEach(folder => {
+                $('#folders').append(`<div class="folder">${folder.folder_name}</div>`)
+            })
+        })
+
+        $.get('/note', {title: currentNote}, function(noteData) {
+            noteData = noteData[0]
+            $('#noteTitle').val(noteData.title)
+            $('#noteData').html(noteData.content)
+            $('#breadCrumbs').text(noteData.folder_name + ' / ' + noteData.title)
+            $('.ql-editor').html(noteData.content)
+
+            console.log(noteData)
+        })
+    } 
 
     let windowHeight = $(window).height()
     $('#noteContainer').attr('style', `height:${windowHeight - 32}px;`)
@@ -35,6 +56,7 @@ $(document).ready(function() {
 
         $('.folder').on('click', function() {
             let folderName = $(this).text()
+            currentFolder = folderName
             $.get('/note_names', {folder_name: folderName}, function(noteNames) {
 
                 $('#notes').html('')
@@ -48,9 +70,11 @@ $(document).ready(function() {
                     $.get('/note', {title: noteName}, function(noteData) {
                         noteData = noteData[0]
                         $('#noteTitle').val(noteData.title)
-                        $('#noteData').text(noteData.content)
+                        $('#noteData').html(noteData.content)
                         $('#breadCrumbs').text(noteData.folder_name + ' / ' + noteData.title)
-                        $('.ql-editor').text(noteData.content)
+                        $('.ql-editor').html(noteData.content)
+                        currentNote = noteData.title
+                        currentNoteID = noteData.id
 
                         console.log(noteData)
                     })
@@ -68,21 +92,36 @@ $(document).ready(function() {
         // console.log(quill.getContents().ops)
     })
 
-    $('#edit').on('click', function() {
+    $('#update').on('click', function() {
         if ($('#noteContainer').css('display') == 'none'){
 
             $('.ql-toolbar').attr('style', 'display: none;')
             $('#editor').attr('style', 'display: none;')
             $('#noteContainer').attr('style', `height:${windowHeight - 32}px;, display:flex;`)
 
-            $('#edit').text('edit')
+            $('#update').text('edit')
+
+            let noteObj = {title: $('#noteTitle').val(), content: $('.ql-editor').html(), folder_name: currentFolder, id: currentNoteID}
+
+            console.log(noteObj)
+
+            $.get('/update_note', noteObj, function(noteData) {
+                console.log(noteData)
+            })
+
+            updateUI()
+
         }else{
 
             $('.ql-toolbar').attr('style', 'display: flex;')
             $('#editor').attr('style', `height:${windowHeight - 74}px;, display:flex;`)
             $('#noteContainer').attr('style', 'display: none;')
 
-            $('#edit').text('save')
+            $('#update').text('save')
+
+            if($('.ql-editor').html() == '<p><br></p>'){
+                $('.ql-editor').html('<p>enter text</p>')
+            }
         }
     })
 })

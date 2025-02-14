@@ -25,6 +25,20 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
+app.get('/last_note', (req, res) => {
+    const testID = process.env.DB_TESTID
+    const updateQuery = 'SELECT last_note_title FROM users WHERE id = ?'
+
+    pool.query(updateQuery, [noteName, testID], (err, results) => {
+        if (err) {
+            console.error('error executing last_note_title update query: ' + err.stack)
+            return res.status(500).send('error updating last_note_title')
+        }
+        console.log('updated last_note_title')
+        res.json(results)
+    })
+})
+
 app.get('/folder_names', (req, res) => {
     const testID = process.env.DB_TESTID
     const query = 'SELECT DISTINCT folder_name FROM notes WHERE user_id = ? ORDER BY modified_at DESC'
@@ -56,7 +70,7 @@ app.get('/note', (req, res) => {
     const noteName = req.query.title
     const testID = process.env.DB_TESTID
 
-    const noteQuery = 'SELECT folder_name, title, content, modified_at, created_at FROM notes WHERE user_id = ? AND  title = ? AND note_type != ? ORDER BY modified_at DESC'
+    const noteQuery = 'SELECT id, folder_name, title, content, modified_at, created_at FROM notes WHERE user_id = ? AND  title = ? AND note_type != ? ORDER BY modified_at DESC'
 
     pool.query(noteQuery, [testID, noteName, 'placeholder'], (err, results) => {
         if (err) {
@@ -73,6 +87,7 @@ app.get('/note', (req, res) => {
             console.error('error executing last_note_title update query: ' + err.stack)
             return res.status(500).send('error updating last_note_title')
         }
+        console.log('updated last_note_title')
     })
 
 })
@@ -101,6 +116,22 @@ app.post('/add_note', (req, res) => {
             return res.status(500).send('Error inserting note')
         }
         res.status(200).send('Note added successfully')
+    })
+})
+
+app.get('/update_note', (req, res) => {
+    const noteData = req.query
+    const testID = process.env.DB_TESTID
+    const query = 'UPDATE notes SET title = ?, content = ?, folder_name = ? WHERE id = ?'
+
+    console.log(noteData)
+    
+    pool.query(query, [noteData.title, noteData.content, noteData.folder_name, noteData.id], (err, result) => {
+        if (err) {
+            console.error('Error inserting note: ' + err.stack)
+            return res.status(500).send('Error inserting note')
+        }
+        res.status(200).send('note updated')
     })
 })
 
