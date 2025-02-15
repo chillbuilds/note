@@ -27,14 +27,13 @@ app.get('/', (req, res) => {
 
 app.get('/last_note', (req, res) => {
     const testID = process.env.DB_TESTID
-    const updateQuery = 'SELECT last_note_title FROM users WHERE id = ?'
+    const updateQuery = 'SELECT folder_name, title, content, id FROM notes WHERE user_id = ? ORDER BY modified_at DESC LIMIT 1'
 
-    pool.query(updateQuery, [noteName, testID], (err, results) => {
+    pool.query(updateQuery, [testID], (err, results) => {
         if (err) {
-            console.error('error executing last_note_title update query: ' + err.stack)
-            return res.status(500).send('error updating last_note_title')
+            console.error('error fetching last_note endpoint query: ' + err.stack)
+            return res.status(500).send('error fetching last note')
         }
-        console.log('updated last_note_title')
         res.json(results)
     })
 })
@@ -48,6 +47,8 @@ app.get('/folder_names', (req, res) => {
             console.error('Error executing query: ' + err.stack)
             return res.status(500).send('error fetching folder names')
         }
+        console.log('folder names:')
+        console.log(results)
         res.json(results)
     })
 })
@@ -78,16 +79,6 @@ app.get('/note', (req, res) => {
             return res.status(500).send('error fetching notes')
         }
         res.json(results)
-    })
-
-    const updateQuery = 'UPDATE users SET last_note_title = ? WHERE id = ?'
-
-    pool.query(updateQuery, [noteName, testID], (err, results) => {
-        if (err) {
-            console.error('error executing last_note_title update query: ' + err.stack)
-            return res.status(500).send('error updating last_note_title')
-        }
-        console.log('updated last_note_title')
     })
 
 })

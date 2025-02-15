@@ -13,25 +13,6 @@ $(document).ready(function() {
     })
     quill.root.setAttribute('spellcheck', false)
 
-    let updateUI = () => {
-        $.get('/folder_names', function(folderNames) {
-            $('#folders').html('')
-            folderNames.forEach(folder => {
-                $('#folders').append(`<div class="folder">${folder.folder_name}</div>`)
-            })
-        })
-
-        $.get('/note', {title: currentNote}, function(noteData) {
-            noteData = noteData[0]
-            $('#noteTitle').val(noteData.title)
-            $('#noteData').html(noteData.content)
-            $('#breadCrumbs').text(noteData.folder_name + ' / ' + noteData.title)
-            $('.ql-editor').html(noteData.content)
-
-            console.log(noteData)
-        })
-    } 
-
     let windowHeight = $(window).height()
     $('#noteContainer').attr('style', `height:${windowHeight - 32}px;`)
     $('#editor').attr('style', 'display:none;')
@@ -42,54 +23,91 @@ $(document).ready(function() {
         $('.ql-editor').html('<p>enter text</p>')
     }
 
+    let updateUI = () => {
+
+        $.get('/last_note', function(noteData) {
+            noteData = noteData[0]
+            $('#noteTitle').val(noteData.title)
+            $('#displayTitle').text(noteData.title)
+            $('#noteData').html(noteData.content)
+            $('.ql-editor').html(noteData.content)
+            currentNote = noteData.title
+            currentNoteID = noteData.id
+            currentFolder = noteData.folder_name
+        })
+
+        $.get('/folder_names', function(folderNames) {
+
+            $('#folders').html('')
+            folderNames.forEach(folder => {
+                $('#folders').append(`<div id="${folder.folder_name}" class="folder">${folder.folder_name}</div>`)
+            })
+
+
+
+            $.get('/note_names', {folder_name: currentFolder}, function(noteNames) {
+                $('#notes').html('')
+                    noteNames.forEach(note => {
+                        $('#notes').append(`<div class="note">${note.title}</div>`)
+                    })
+    
+                    $('.note').on('click', function() {
+                        const noteName = $(this).text()
+                        $.get('/note', {title: noteName}, function(noteData) {
+                            noteData = noteData[0]
+                            $('#noteTitle').val(noteData.title)
+                            $('#displayTitle').text(noteData.title)
+                            $('#noteData').html(noteData.content)
+                            $('.ql-editor').html(noteData.content)
+                            currentNote = noteData.title
+                            currentNoteID = noteData.id
+    
+                            console.log(noteData)
+                        })
+                    })
+            })
+    
+            $('.folder').on('click', function() {
+                let folderName = $(this).text()
+                currentFolder = folderName
+                $.get('/note_names', {folder_name: folderName}, function(noteNames) {
+    
+                    $('#notes').html('')
+                    noteNames.forEach(note => {
+                        console.log(note.title)
+                        $('#notes').append(`<div class="note">${note.title}</div>`)
+                    })
+    
+                    $('.note').on('click', function() {
+                        const noteName = $(this).text()
+                        $.get('/note', {title: noteName}, function(noteData) {
+                            noteData = noteData[0]
+                            $('#noteTitle').val(noteData.title)
+                            $('#displayTitle').text(noteData.title)
+                            $('#noteData').html(noteData.content)
+                            $('.ql-editor').html(noteData.content)
+                            currentNote = noteData.title
+                            currentNoteID = noteData.id
+    
+                            console.log(noteData)
+                        })
+                    })
+                })
+            })
+          
+        }).fail(function(err) {
+          alert('error fetching data')
+          console.log(err)
+        })
+
+    }
+
+    updateUI()
+
     $('.ql-editor').on('click', function() {
         if($('.ql-editor').html() == '<p>enter text</p>'){
             $('.ql-editor').html('')
         }
-    })
-    
-    $.get('/folder_names', function(folderNames) {
-
-        folderNames.forEach(folder => {
-            $('#folders').append(`<div class="folder">${folder.folder_name}</div>`)
-        })
-
-        $('.folder').on('click', function() {
-            let folderName = $(this).text()
-            currentFolder = folderName
-            $.get('/note_names', {folder_name: folderName}, function(noteNames) {
-
-                $('#notes').html('')
-                noteNames.forEach(note => {
-                    console.log(note.title)
-                    $('#notes').append(`<div class="note">${note.title}</div>`)
-                })
-
-                $('.note').on('click', function() {
-                    const noteName = $(this).text()
-                    $.get('/note', {title: noteName}, function(noteData) {
-                        noteData = noteData[0]
-                        $('#noteTitle').val(noteData.title)
-                        $('#noteData').html(noteData.content)
-                        $('#breadCrumbs').text(noteData.folder_name + ' / ' + noteData.title)
-                        $('.ql-editor').html(noteData.content)
-                        currentNote = noteData.title
-                        currentNoteID = noteData.id
-
-                        console.log(noteData)
-                    })
-                })
-            })
-        })
-      
-    }).fail(function(err) {
-      alert('error fetching data')
-      console.log(err)
-    })
-
-    $('#update').on('click', function() {
-        console.log($('.ql-editor').html().toString())
-        // console.log(quill.getContents().ops)
     })
 
     $('#update').on('click', function() {
