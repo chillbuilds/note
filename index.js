@@ -47,8 +47,6 @@ app.get('/folder_names', (req, res) => {
             console.error('Error executing query: ' + err.stack)
             return res.status(500).send('error fetching folder names')
         }
-        console.log('folder names:')
-        console.log(results)
         res.json(results)
     })
 })

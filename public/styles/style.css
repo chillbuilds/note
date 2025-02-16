@@ -47,6 +47,16 @@ body {
 
 .note {
     cursor: pointer;
+    margin: 2px;
+    margin-bottom: 8px;
+    padding: 4px;
+    border: solid #1D3461 2px;
+    text-align: center;
+}
+
+.note:hover {
+    background: #1D3461;
+    color: #EFEFEF;
 }
 
 #noteTitle {
