@@ -87,6 +87,7 @@ let updateUI = () => {
                 $('#notes').append(`<div val="${note.title}" class="note">${note.title}</div>`)
             })
 
+            $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
 
             $('.note').on('click', function() {
                 const noteName = $(this).text()

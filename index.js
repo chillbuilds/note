@@ -40,7 +40,7 @@ app.get('/last_note', (req, res) => {
 
 app.get('/folder_names', (req, res) => {
     const testID = process.env.DB_TESTID
-    const query = 'SELECT DISTINCT folder_name FROM notes WHERE user_id = ? ORDER BY modified_at DESC'
+    const query = 'SELECT DISTINCT folder_name FROM notes WHERE user_id = ?'
 
     pool.query(query, [testID], (err, results) => {
         if (err) {
