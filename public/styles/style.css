@@ -19,6 +19,7 @@ body {
 }
 
 .column {
+    position: relative;
     border: #1D3461 solid 2px;
     padding: 8px;
     display: flex;
@@ -76,8 +77,26 @@ body {
     border-bottom: 2px solid #1D3461;
 }
 
-#editor {
-    
+.icon {
+    position: absolute;
+    bottom: 2px;
+    right: 8px;
+    width: 32px;
+    cursor: pointer;
+}
+
+.trashIcon {
+    width: 38px;
+}
+
+.add {
+    right: 38px;
+}
+
+.addIcon {
+    width: 32px;
+    position: relative;
+    bottom: 2px;
 }
 
 .ql-toolbar {

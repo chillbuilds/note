@@ -13,6 +13,8 @@ const quill = new Quill('#editor', {
 })
 quill.root.setAttribute('spellcheck', false)
 
+$('#noteContainer').on('click', )
+
 let windowHeight = $(window).height()
 $('#noteContainer').attr('style', `height:${windowHeight - 32}px;`)
 $('#editor').attr('style', 'display:none;')
@@ -22,6 +24,22 @@ $('.ql-editor').attr('style', 'padding:4px;')
 if($('.ql-editor').html() == '<p><br></p>'){
     $('.ql-editor').html('<p>enter text</p>')
 }
+
+$('.icon').on('click', function() {
+    let actionBtn = $(this).attr('id')
+    if(actionBtn == 'addNote'){
+        alert('add em up')
+    }
+    if(actionBtn == 'deleteNote'){
+
+    }
+    if(actionBtn == 'addFolder'){
+
+    }
+    if(actionBtn == 'deleteFolder'){
+
+    }
+})
 
 let updateUI = () => {
 
@@ -165,6 +183,9 @@ $('#update').on('click', function() {
         updateUI()
 
     }else{
+
+        console.log('currentFolder:', currentFolder)
+        console.log('currentNote:', currentNote)
 
         $('.ql-toolbar').attr('style', 'display: flex;')
         $('#editor').attr('style', `height:${windowHeight - 74}px;, display:flex;`)
