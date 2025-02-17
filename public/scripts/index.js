@@ -1,6 +1,8 @@
 let currentFolder = ''
+let currentFolderID = ''
 let currentNote = ''
 let currentNoteID = ''
+let editMode = false
 
 $(document).ready(function() {
 
@@ -25,17 +27,44 @@ if($('.ql-editor').html() == '<p><br></p>'){
     $('.ql-editor').html('<p>enter text</p>')
 }
 
-$('.icon').on('click', function() {
+$('.sideColIcon').on('click', function() {
     let actionBtn = $(this).attr('id')
+
     if(actionBtn == 'addNote'){
-        alert('add em up')
+        if($('#editor').css('display') == 'none'){
+            $('#noteTitle').val('')
+            $('.ql-editor').html('<p>enter text</p>')
+            $('#update').click()
+            $('#noteTitle').focus()
+            editMode = true
+        }
     }
+
     if(actionBtn == 'deleteNote'){
 
     }
-    if(actionBtn == 'addFolder'){
 
+    if(actionBtn == 'addFolder'){
+        let folderName = $('#folderInput').val()
+        if(folderName){
+            $.ajax({
+            url: '/add_folder',
+            method: 'POST',
+            data: {
+                name: folderName, user_id: 1
+            },
+            success: function(response) {
+                console.log(response)
+            },
+            error: function(xhr, status, error) {
+                console.error(error)
+            }
+            })
+        }else{
+            alert('folder name is blank')
+        }
     }
+    
     if(actionBtn == 'deleteFolder'){
 
     }
@@ -43,25 +72,40 @@ $('.icon').on('click', function() {
 
 let updateUI = () => {
 
-    $.get('/last_note', function(noteData) {
-        noteData = noteData[0]
-        $('#noteTitle').val(noteData.title)
-        $('#displayTitle').text(noteData.title)
-        $('#noteData').html(noteData.content)
-        $('.ql-editor').html(noteData.content)
-        currentNote = noteData.title
-        currentNoteID = noteData.id
-        currentFolder = noteData.folder_name
+    $.ajax({
+        url: '/last_note',
+        method: 'GET',
+        success: function(noteData) {
+            if(!noteData.length){
+                // fix - make em make a note
+            }else{
+                noteData = noteData[0]
+                console.log(noteData)
+                $('#noteTitle').val(noteData.title)
+                $('#displayTitle').text(noteData.title)
+                $('#noteData').html(noteData.content)
+                $('.ql-editor').html(noteData.content)
+                currentNote = noteData.title
+                currentNoteID = noteData.id
+                currentFolder = noteData.folder_name
+                currentFolderID = noteData.folder_id
+                console.log(currentFolderID)
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error retrieving note:", error)
+        }
     }).then( err => {
 
     $.get('/folder_names', function(folderNames) {
-
+        console.log(folderNames)
         $('#folders').html('')
         folderNames.forEach(folder => {
-            $('#folders').append(`<div val="${folder.folder_name}" class="folder">${folder.folder_name}</div>`)
+            $('#folders').append(`<div val="${folder.name}" id="folder-${folder.folder_id}" class="folder">${folder.name}</div>`)
         })
 
-    }).then(err => {
+    })
+}).then(err => {
     $.get('/note_names', {folder_name: currentFolder}, function(noteNames) {
 
         $('#notes').html('')
@@ -81,18 +125,22 @@ let updateUI = () => {
                 $('.ql-editor').html(noteData.content)
                 currentNote = noteData.title
                 currentNoteID = noteData.id
+                currentFolder = noteData.folder_name
+                currentFolderID = noteData.folder_id
+
+                console.log(currentFolderID)
 
                 $('.note').attr('style', 'background:#EFEFEF; color:black;')
                 $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
-
-                console.log(noteData)
             })
         })
-    })
 
+        
+    }).then(err => {
     $('.folder').on('click', function() {
 
         let folderName = $(this).text()
+        currentFolderID = $(this).attr('id').split('folder-').join('')
         currentFolder = folderName
 
         $('.folder').attr('style', 'background:#EFEFEF; color:black;')
@@ -117,6 +165,10 @@ let updateUI = () => {
                     $('.ql-editor').html(noteData.content)
                     currentNote = noteData.title
                     currentNoteID = noteData.id
+                    currentFolder = noteData.folder_name
+                    currentFolderID = noteData.folder_id
+
+                    console.log(currentFolderID)
 
                     $('.note').attr('style', 'background:#EFEFEF; color:black;')
                     $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
@@ -126,8 +178,7 @@ let updateUI = () => {
             })
         })
     })
-    $(`.folder[val="${currentFolder}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
-    })
+    $(`.folder[val="${currentFolder}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')})
     }).fail(function(err) {
         alert('error fetching data')
         console.log(err)
@@ -135,27 +186,7 @@ let updateUI = () => {
 
 }
 
-$.get('/last_note', function(noteData) {
-    noteData = noteData[0]
-    $('#noteTitle').val(noteData.title)
-    $('#displayTitle').text(noteData.title)
-    $('#noteData').html(noteData.content)
-    $('.ql-editor').html(noteData.content)
-    currentNote = noteData.title
-    currentNoteID = noteData.id
-    currentFolder = noteData.folder_name
-
-}).then(err => {
-    $.get('/folder_names', function(folderNames) {
-
-        $('#folders').html('')
-        folderNames.forEach(folder => {
-            $('#folders').append(`<div val="${folder.folder_name}" class="folder">${folder.folder_name}</div>`)
-        })
-    }).then(err => {
-        updateUI()
-    })
-})
+    updateUI()
 
 $('.ql-editor').on('click', function() {
     if($('.ql-editor').html() == '<p>enter text</p>'){
@@ -172,19 +203,37 @@ $('#update').on('click', function() {
 
         $('#update').text('edit')
 
-        let noteObj = {title: $('#noteTitle').val(), content: $('.ql-editor').html(), folder_name: currentFolder, id: currentNoteID}
+        let noteObj = {title: $('#noteTitle').val(), content: $('.ql-editor').html(), folder_id: currentFolderID, id: currentNoteID}
 
-        console.log(noteObj)
-
-        $.get('/update_note', noteObj, function(noteData) {
-            console.log(noteData)
-        })
+        if(editMode == true){
+            $.ajax({
+                url: '/add_note',
+                method: 'POST',
+                data: {
+                    user_id: 1,
+                    title: $('#noteTitle').val(),
+                    content: $('.ql-editor').html(),
+                    folder_id: currentFolderID
+                },
+                success: function(response) {
+                    console.log('note added successfully:', response)
+                    editMode == true
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error updating note:', error)
+                }
+            })
+        }else{
+            $.get('/update_note', noteObj, function(noteData) {
+                console.log(noteData)
+            })
+        }
 
         updateUI()
 
     }else{
 
-        console.log('currentFolder:', currentFolder)
+        // console.log('currentFolder:', currentFolder)
         console.log('currentNote:', currentNote)
 
         $('.ql-toolbar').attr('style', 'display: flex;')
@@ -200,3 +249,7 @@ $('#update').on('click', function() {
 })
 
 })
+
+setInterval(()=>{
+    console.log(currentFolderID)
+}, 1000)

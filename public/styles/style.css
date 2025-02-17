@@ -77,26 +77,42 @@ body {
     border-bottom: 2px solid #1D3461;
 }
 
-.icon {
-    position: absolute;
-    bottom: 2px;
-    right: 8px;
-    width: 32px;
+.sideColIcon {
+    position: relative;
+    float: left;
+    /* bottom: 0px;
+    right: 0px; */
     cursor: pointer;
+    border: 1px solid black;
+    border-radius: 50%;
+}
+
+.sideColIconTray {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.sideColIcon:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+#folderInput {
+    width: 200px;
+}
+
+#folderInputContainer {
+    position: absolute;
+    right: 80px;
+    z-index: 20;
 }
 
 .trashIcon {
-    width: 38px;
-}
-
-.add {
-    right: 38px;
+    width: 32px;
 }
 
 .addIcon {
     width: 32px;
-    position: relative;
-    bottom: 2px;
 }
 
 .ql-toolbar {
