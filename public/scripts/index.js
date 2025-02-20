@@ -36,8 +36,8 @@ $('.sideColIcon').on('click', function() {
             $('.ql-editor').html('<p>enter text</p>')
             $('#update').click()
             $('#noteTitle').focus()
-            editMode = true
         }
+        editMode = true
     }
 
     if(actionBtn == 'deleteNote'){
@@ -60,6 +60,7 @@ $('.sideColIcon').on('click', function() {
                 console.error(error)
             }
             })
+            updateUI()
         }else{
             alert('folder name is blank')
         }
@@ -116,46 +117,7 @@ let updateUI = () => {
         $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
 
         $('.note').on('click', function() {
-            const noteName = $(this).text()
-            $.get('/note', {title: noteName}, function(noteData) {
-                noteData = noteData[0]
-                $('#noteTitle').val(noteData.title)
-                $('#displayTitle').text(noteData.title)
-                $('#noteData').html(noteData.content)
-                $('.ql-editor').html(noteData.content)
-                currentNote = noteData.title
-                currentNoteID = noteData.id
-                currentFolder = noteData.folder_name
-                currentFolderID = noteData.folder_id
-
-                console.log(currentFolderID)
-
-                $('.note').attr('style', 'background:#EFEFEF; color:black;')
-                $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
-            })
-        })
-
-        
-    }).then(err => {
-    $('.folder').on('click', function() {
-
-        let folderName = $(this).text()
-        currentFolderID = $(this).attr('id').split('folder-').join('')
-        currentFolder = folderName
-
-        $('.folder').attr('style', 'background:#EFEFEF; color:black;')
-        $(`.folder[val="${currentFolder}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
-
-        $.get('/note_names', {folder_name: folderName}, function(noteNames) {
-
-            $('#notes').html('')
-            noteNames.forEach(note => {
-                $('#notes').append(`<div val="${note.title}" class="note">${note.title}</div>`)
-            })
-
-            $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
-
-            $('.note').on('click', function() {
+            if(!editMode){
                 const noteName = $(this).text()
                 $.get('/note', {title: noteName}, function(noteData) {
                     noteData = noteData[0]
@@ -172,11 +134,55 @@ let updateUI = () => {
 
                     $('.note').attr('style', 'background:#EFEFEF; color:black;')
                     $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
+                })
+            }
+        })
 
-                    console.log(noteData)
+        
+    }).then(err => {
+    $('.folder').on('click', function() {
+        if(!editMode){
+            let folderName = $(this).text()
+            currentFolderID = $(this).attr('id').split('folder-').join('')
+            currentFolder = folderName
+
+            $('.folder').attr('style', 'background:#EFEFEF; color:black;')
+            $(`.folder[val="${currentFolder}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
+
+            $.get('/note_names', {folder_name: folderName}, function(noteNames) {
+
+                $('#notes').html('')
+                noteNames.forEach(note => {
+                    $('#notes').append(`<div val="${note.title}" class="note">${note.title}</div>`)
+                })
+
+                $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
+
+                $('.note').on('click', function() {
+                    if(!editMode){
+                        const noteName = $(this).text()
+                        $.get('/note', {title: noteName}, function(noteData) {
+                            noteData = noteData[0]
+                            $('#noteTitle').val(noteData.title)
+                            $('#displayTitle').text(noteData.title)
+                            $('#noteData').html(noteData.content)
+                            $('.ql-editor').html(noteData.content)
+                            currentNote = noteData.title
+                            currentNoteID = noteData.id
+                            currentFolder = noteData.folder_name
+                            currentFolderID = noteData.folder_id
+
+                            console.log(currentFolderID)
+
+                            $('.note').attr('style', 'background:#EFEFEF; color:black;')
+                            $(`.note[val="${currentNote}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')
+
+                            console.log(noteData)
+                        })
+                    }
                 })
             })
-        })
+        }
     })
     $(`.folder[val="${currentFolder}"]`).attr('style', 'background:#1D3461; color:#EFEFEF;')})
     }).fail(function(err) {
@@ -217,7 +223,7 @@ $('#update').on('click', function() {
                 },
                 success: function(response) {
                     console.log('note added successfully:', response)
-                    editMode == true
+                    editMode = false
                 },
                 error: function(xhr, status, error) {
                     console.error('Error updating note:', error)
@@ -233,7 +239,6 @@ $('#update').on('click', function() {
 
     }else{
 
-        // console.log('currentFolder:', currentFolder)
         console.log('currentNote:', currentNote)
 
         $('.ql-toolbar').attr('style', 'display: flex;')
@@ -248,8 +253,42 @@ $('#update').on('click', function() {
     }
 })
 
+$('body').on('click', function(event) {
+    let $target = $(event.target)
+
+    // if(!$target.hasClass('addIcon') && !editMode){
+    //     editMode = true
+    // }
+
+    if($target.hasClass('note') && editMode == true){
+        if(confirm('discard changes?')){
+            editMode = false
+            console.log('discard')
+            $(`.note[val="${currentNote}"]`).click()
+        } else{
+            // editMode = false
+            console.log('save')
+        }   
+    }else if($target.hasClass('folder') && editMode ==true){
+        if(confirm('discard changes?')){
+            editMode = false
+            console.log('discard')
+            $(`.folder[val="${currentNote}"]`).click()
+        } else{
+            // editMode = false
+            console.log('save')
+        }
+    }
+    // if (!$target.closest('.ql-toolbar, #editor').length && editMode && !$target.hasClass('addIcon')) {
+    //         alert('disacard changes')
+    //         editMode = false
+    // } else {
+    //     console.log('Clicked inside one of the divs')
+    // }
 })
 
-setInterval(()=>{
-    console.log(currentFolderID)
-}, 1000)
+})
+
+setInterval(() => {
+    console.log('edit mode:', editMode)
+}, 500)
